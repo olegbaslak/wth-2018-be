@@ -11,7 +11,7 @@ namespace WikiQuiz.Services
 
             for (int i = 0; i < count; i++)
             {
-                var q1 = new TriviaQuestion { Question = $"This is q-{i}:", Answer = $"Answer for {i}", WrongAnswers = new List<string> { "Wrong1", "Wrong2", "Wrong3", "Wrong4" } };
+                var q1 = new TriviaQuestion { Question = $"This is q-{i}", Answer = $"Answer for {i}", WrongAnswers = new List<string> { "Wrong1", "Wrong2", "Wrong3", "Wrong4" } };
                 trivia.Add(q1);
             }
 
