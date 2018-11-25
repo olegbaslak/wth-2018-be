@@ -166,6 +166,7 @@ namespace WikiQuiz.Services.Fetching
                 Correct = correctIndex + 1,
                 Answers = shuffledAnswers
             };
+
             return triviaQuestion;
         }
 

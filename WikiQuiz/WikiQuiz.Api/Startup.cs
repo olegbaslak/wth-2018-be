@@ -38,6 +38,7 @@ namespace WikiQuiz.Api
                 .AllowAnyHeader()
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
+                .AllowCredentials()
             );
 
             app.UseHttpsRedirection();

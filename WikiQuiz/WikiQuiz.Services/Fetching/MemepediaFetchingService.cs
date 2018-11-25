@@ -73,18 +73,31 @@ namespace WikiQuiz.Services.Fetching
             allMemeA.Remove(wrong2);
             var wrong3 = allMemeA.RandomElement();
 
-            var shuffledAnswers = new List<string> { wrong1.InnerText, wrong2.InnerText, "*", wrong3.InnerText };
+            var shuffledAnswers = new List<string> { new string(wrong1.InnerText), new string(wrong2.InnerText), "*", new string(wrong3.InnerText) };
             shuffledAnswers.Shuffle();
             var correctIndex = shuffledAnswers.IndexOf("*");
             shuffledAnswers[correctIndex] = memeTitle;
 
             var triviaQuestion = new TriviaQuestion
             {
-                Question = randomMemeImageHtml,
+                Question = new string(randomMemeImageHtml),
                 Correct = correctIndex + 1,
-                Answers = shuffledAnswers
+                Answers = new List<string>(shuffledAnswers)
             };
 
+
+            mainPageContent = null;
+            htmlDocument = null;
+            categories = null;
+            randomCategory = null;
+            memesInCategory = null;
+            randomMemeNode = null;
+            memePageContent = null;
+            allMemeA = null;
+            imagesHtlm = null;
+            videosHtlm = null;
+            allMemeImagesHtml = null;
+            shuffledAnswers = null;
 
             return triviaQuestion;
         }

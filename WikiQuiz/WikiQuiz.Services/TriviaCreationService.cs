@@ -37,10 +37,13 @@ namespace WikiQuiz.Services
 
                 trivia = new Trivia();
 
-                for (int i = 0; i < count; i+=2)
+                for (int i = 0; i < count; i += 2)
                 {
+                    GC.AddMemoryPressure(300000);
                     var question = await memeFether.GetRandomQuestion();
                     trivia.Add(question);
+                    GC.RemoveMemoryPressure(300000);
+                    GC.Collect();
                 }
                 for (int i = 1; i < count; i += 2)
                 {
