@@ -44,6 +44,7 @@ namespace WikiQuiz.Services
                     trivia.Add(question);
                     GC.RemoveMemoryPressure(300000);
                     GC.Collect();
+                    GC.WaitForPendingFinalizers();
                 }
                 for (int i = 1; i < count; i += 2)
                 {
@@ -61,11 +62,16 @@ namespace WikiQuiz.Services
 
             for (int i = 0; i < count; i++)
             {
+                GC.AddMemoryPressure(300000);
                 var question = await fetcher.GetRandomQuestion();
                 trivia.Add(question);
+                GC.RemoveMemoryPressure(300000);
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
 
             GC.Collect();
+            GC.WaitForPendingFinalizers();
             return trivia;
         }
     }

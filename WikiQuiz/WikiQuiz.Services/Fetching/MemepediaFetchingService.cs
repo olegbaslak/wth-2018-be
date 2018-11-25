@@ -33,7 +33,7 @@ namespace WikiQuiz.Services.Fetching
 
         private async Task<TriviaQuestion> GetRandomQuestionAndParse()
         {
-            var mainPageContent = await FetchContent(MainPageUrl);
+                        var mainPageContent = await FetchContent(MainPageUrl);
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(mainPageContent);
@@ -98,6 +98,8 @@ namespace WikiQuiz.Services.Fetching
             videosHtlm = null;
             allMemeImagesHtml = null;
             shuffledAnswers = null;
+
+            GC.Collect();
 
             return triviaQuestion;
         }
