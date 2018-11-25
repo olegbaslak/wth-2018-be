@@ -58,6 +58,7 @@ namespace WikiQuiz.Services.Fetching
             if (videosHtlm.Count > 0)
             {
                 randomMemeImageHtml = videosHtlm.RandomElement();
+                randomMemeImageHtml = Regex.Replace(randomMemeImageHtml, @"(<video )", "<video autoplay");
             }
             else
             {
