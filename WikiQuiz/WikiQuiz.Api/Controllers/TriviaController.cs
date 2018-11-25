@@ -24,8 +24,8 @@ namespace WikiQuiz.Api.Controllers
         }
 
         // GET api/trivia/{count}?source=wiki
-        [HttpGet("{count}")]
-        public async Task<JsonResult> Get(int count, string source)
+        [HttpGet("{count}/{source?}")]
+        public async Task<JsonResult> Get(int count, [FromQuery] string source = "wiki")
         {
             var isParsed = Enum.TryParse(source, out Source quizSource);
 
