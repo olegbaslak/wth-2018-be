@@ -63,7 +63,7 @@ namespace WikiQuiz.Services.Fetching
             {
                 randomMemeImageHtml = imagesHtlm.RandomElement();
             }
-            CleanupImageHtml(randomMemeImageHtml);
+            randomMemeImageHtml = CleanupImageHtml(randomMemeImageHtml);
 
             var allMemeImagesHtml = imagesHtlm.Concat(videosHtlm).ToList();
             var wrong1 = allMemeA.RandomElement();
@@ -112,10 +112,12 @@ namespace WikiQuiz.Services.Fetching
             throw new Exception("Something went wrong during fetching question");
         }
 
-        private void CleanupImageHtml(string imageHtml)
+        private string CleanupImageHtml(string imageHtml)
         {
-            imageHtml = Regex.Replace(imageHtml, "(width=\".*? \")", string.Empty);
-            imageHtml = Regex.Replace(imageHtml, "(height=\".*? \")", string.Empty);
+            imageHtml = Regex.Replace(imageHtml, "(width=\".*?\")", string.Empty);
+            imageHtml = Regex.Replace(imageHtml, "(height=\".*?\")", string.Empty);
+
+            return imageHtml;
         }
     }
 }
