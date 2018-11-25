@@ -16,9 +16,18 @@ namespace WikiQuiz.Models
         public Text(string text)
         {
             text = text.Replace("\r", string.Empty).Replace("\n", string.Empty);
+
+            // Removing all text in bracets
+            text = Regex.Replace(text, @"(\(.*?\))", string.Empty);
+
+            // Remove ., and . in parenthes
+            text = Regex.Replace(text, @"(\.,)", string.Empty);
+            text = Regex.Replace(text, @"\(.*?(\.).*?\)", string.Empty);
+
             InnerText = text;
             Sentances = Regex.Split(text, SentancesSplitPattern, RegexOptions.Singleline)
-                .Select(s => new Sentance(s))
+                .Where(s=>s.Trim() != string.Empty)
+                .Select(s => new Sentance(s.Trim()))
                 .Where(s => s.Words.Count > 0)
                 .ToList();
         }

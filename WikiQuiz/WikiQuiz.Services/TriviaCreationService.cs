@@ -12,6 +12,7 @@ namespace WikiQuiz.Services
 
         public enum Source
         {
+            Any,
             Wiki,
             Meme
         }
@@ -24,12 +25,36 @@ namespace WikiQuiz.Services
         public async Task<Trivia> Create(int count = 1)
         {
             IFetchingService fetcher;
+            Trivia trivia = new Trivia();
 
             if (_source == Source.Wiki) fetcher = new WikiFetchingService();
             else if (_source == Source.Meme) fetcher = new MemepediaFetchingService();
-            else throw new NotSupportedException($"Source {_source} is not supported");
 
-            Trivia trivia = new Trivia();
+            else if (_source == Source.Any)
+            {
+                var wikiFetcher = new WikiFetchingService();
+                var memeFether = new MemepediaFetchingService();
+
+                trivia = new Trivia();
+
+                for (int i = 0; i < count; i+=2)
+                {
+                    var question = await memeFether.GetRandomQuestion();
+                    trivia.Add(question);
+                }
+                for (int i = 1; i < count; i += 2)
+                {
+                    var question = await wikiFetcher.GetRandomQuestion();
+                    trivia.Add(question);
+                }
+
+                return trivia;
+            }
+
+            else
+            {
+                throw new NotSupportedException($"Source {_source} is not supported");
+            }
 
             for (int i = 0; i < count; i++)
             {

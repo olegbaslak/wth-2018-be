@@ -21,13 +21,40 @@ namespace WikiQuiz.Services.Fetching
         private readonly Faker _faker = new Faker();
 
         private readonly IList<string> GarbishWords = new List<string> {
-        "а",
-        "и",
-        "на",
-        "в",
-        "про",
-        "от",
-        ""
+        "еще", "него", "сказать", "а", "ж", "нее", "со", "без", "же", "ней", "совсем", "более",
+            "жизнь", "нельзя", "так", "больше", "за", "нет", "такой", "будет", "зачем", "ни", "там",
+"будто", "здесь", "нибудь", "тебя", "бы", "и", "никогда", "тем", "был", "из", "ним", "теперь", "была", "из-за", "них", "то",
+"были", "или", "ничего", "тогда", "было", "им", "но", "того",
+"быть", "иногда", "ну", "тоже",
+"в", "   их", "о", "только",
+"вам","к","об","том",
+"вас","кажется","один","тот",
+"вдруг","как","он","три",
+"ведь","какая","она","тут",
+"во","какой","они","ты",
+"вот","когда","опять","у",
+"впрочем","конечно","от","уж",
+"все","которого","перед","уже",
+"всегда","которые","по","хорошо",
+"всего","кто","под","хоть",
+"всех","куда","после", "чего",
+"всю","ли","потом","человек",
+"вы","лучше","потому","чем",
+"г","между","почти","через",
+"где","меня","при","что",
+"говорил","мне","про","чтоб",
+"да","много","раз","чтобы",
+"даже","может","разве","чуть",
+"два","можно","с","эти",
+"для","мой","сам","этого",
+"до","моя","свое","этой",
+"другой","мы","свою","этом",
+"его","на","себе","этот",
+"ее","над","себя","эту",
+"ей","надо","сегодня","я",
+"ему","наконец","сейчас",
+"если","нас","сказал",
+"есть","не","сказала"
         };
 
         public async Task<string> GetRandom()
@@ -49,15 +76,56 @@ namespace WikiQuiz.Services.Fetching
             const string separator = "—";
 
             var paragraph = ExctractFirstParagraph(htmlContent);
+            paragraph = Regex.Replace(paragraph, SquareBracetsPattern, string.Empty);
             var paragraphEntity = new Text(paragraph);
             var fullDefinition = paragraphEntity.Sentances[0].Text;
 
             var separatorIndex = fullDefinition.IndexOf(separator);
             var definition = fullDefinition.Substring(0, separatorIndex - 1);
+            definition = Regex.Replace(definition, @"(\(.*?\))", string.Empty);
             var definitionText = fullDefinition.Substring(separatorIndex + 2);
             definitionText = definitionText[0].ToString().ToUpper() + definitionText.Substring(1);
 
-            var shuffledAnswers = new List<string> { "*", "W1", "W2", "W3" };
+
+            // Wrong angsers:
+            var text = string.Join(". ", ExtractParagraps(htmlContent));
+            var cleanText = new Text(Regex.Replace(text, SquareBracetsPattern, string.Empty));
+            var cleanSentances = CleanFromGarbish(cleanText.Sentances.Select(s => s.Text)).ToList();
+
+            var valueableWords = cleanSentances
+                .SelectMany(s =>
+                    new Sentance(s).Words
+                        .Where(w =>
+                            !s.StartsWith(w) &&
+                            char.IsUpper(w[0])).ToList())
+                .Distinct().ToList();
+
+            var wrong1 = string.Empty;
+            var wrong2 = string.Empty;
+            var wrong3 = string.Empty;
+
+            if (valueableWords.Count > 1)
+            {
+                wrong1 = _faker.PickRandom(valueableWords);
+                valueableWords.Remove(wrong1);
+            }
+            else wrong1 = _faker.PickRandom(new Sentance(_faker.PickRandom(cleanSentances)).Words);
+
+            if (valueableWords.Count > 1)
+            {
+                wrong2 = _faker.PickRandom(valueableWords);
+                valueableWords.Remove(wrong2);
+            }
+            else wrong2 = _faker.PickRandom(new Sentance(_faker.PickRandom(cleanSentances)).Words);
+
+            if (valueableWords.Count > 1)
+            {
+                wrong3 = _faker.PickRandom(valueableWords);
+                valueableWords.Remove(wrong3);
+            }
+            else wrong3 = _faker.PickRandom(new Sentance(_faker.PickRandom(cleanSentances)).Words);
+
+            var shuffledAnswers = new List<string> { wrong1, "*", wrong2, wrong3 };
             shuffledAnswers.Shuffle();
             var correctIndex = shuffledAnswers.IndexOf("*");
             shuffledAnswers[correctIndex] = definition;

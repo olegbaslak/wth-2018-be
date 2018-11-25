@@ -66,7 +66,7 @@ namespace WikiQuiz.Services.Fetching
             allMemeA.Remove(wrong2);
             var wrong3 = _faker.PickRandom(allMemeA);
 
-            var shuffledAnswers = new List<string> { "*", wrong1.InnerText, wrong2.InnerText, wrong3.InnerText };
+            var shuffledAnswers = new List<string> { wrong1.InnerText, wrong2.InnerText, "*", wrong3.InnerText };
             shuffledAnswers.Shuffle();
             var correctIndex = shuffledAnswers.IndexOf("*");
             shuffledAnswers[correctIndex] = memeTitle;

@@ -17,15 +17,15 @@ namespace WikiQuiz.Api.Controllers
         public async Task<JsonResult> Get()
         {
             Console.WriteLine("Queried");
-            var service = new TriviaCreationService(Source.Wiki);
-            var trivia = await service.Create(3);
+            var service = new TriviaCreationService(Source.Any);
+            var trivia = await service.Create(5);
 
             return new JsonResult(trivia);
         }
 
         // GET api/trivia/{count}?source=wiki
         [HttpGet("{count}/{source?}")]
-        public async Task<JsonResult> Get(int count, [FromQuery] string s = "Wiki")
+        public async Task<JsonResult> Get(int count, [FromQuery] string s = "Any")
         {
             var isParsed = Enum.TryParse(s, out Source quizSource);
 
