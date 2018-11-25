@@ -14,7 +14,7 @@ namespace WikiQuiz.Api.Controllers
         [HttpGet]
         public async Task<JsonResult> Get()
         {
-            Console.WriteLine("Queried GET api/trivia");
+            Console.WriteLine($"GET api/trivia/{5}?s={Source.Any}");
             var service = new TriviaCreationService(Source.Any);
             var trivia = await service.Create(5);
 
@@ -25,7 +25,7 @@ namespace WikiQuiz.Api.Controllers
         [HttpGet("{count}/{source?}")]
         public async Task<JsonResult> Get(int count, [FromQuery] string s = "Any")
         {
-            Console.WriteLine("GET api/trivia/{count}?source=Any");
+            Console.WriteLine($"GET api/trivia/{count}?s={s}");
 
             var isParsed = Enum.TryParse(s, out Source quizSource);
 
