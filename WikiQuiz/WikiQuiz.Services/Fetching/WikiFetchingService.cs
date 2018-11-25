@@ -134,6 +134,8 @@ namespace WikiQuiz.Services.Fetching
                 Answers = shuffledAnswers
             };
 
+            GC.Collect();
+
             return triviaQuestion;
         }
 

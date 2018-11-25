@@ -86,6 +86,10 @@ namespace WikiQuiz.Services.Fetching
             };
 
 
+            imagesHtlm.RemoveAll(s=>s.Length>0);
+            videosHtlm.RemoveAll(s=>s.Length>0);
+
+
             mainPageContent = null;
             htmlDocument = null;
             categories = null;
@@ -98,6 +102,7 @@ namespace WikiQuiz.Services.Fetching
             videosHtlm = null;
             allMemeImagesHtml = null;
             shuffledAnswers = null;
+            randomMemeImageHtml = null;
 
             GC.Collect();
 
