@@ -64,28 +64,6 @@ namespace WikiQuiz.Services
 
             GC.Collect();
             return trivia;
-
-            /*
-            if (_source == Source.Wiki)
-            {
-                var fetcher = new WikiFetchingService();
-
-                Trivia trivia = new Trivia();
-
-                for (int i = 0; i < count; i++)
-                {
-                    var question = await fetcher.GetRandomQuestion();
-                    trivia.Add(question);
-                }
-
-                return trivia;
-            }
-            else if (_source == Source.Meme)
-            {
-                var fetcher = new MemepediaFetchingService();
-            }
-
-            throw new NotSupportedException($"Source {_source} is not supported.");*/
         }
     }
 }

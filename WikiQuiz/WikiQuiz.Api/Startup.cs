@@ -34,7 +34,7 @@ namespace WikiQuiz.Api
                 app.UseHsts();
             }
 
-            app.UseCors(builder => builder.WithOrigins("https://localhost")
+            app.UseCors(builder => builder.WithOrigins("*")
                 .AllowAnyHeader()
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
