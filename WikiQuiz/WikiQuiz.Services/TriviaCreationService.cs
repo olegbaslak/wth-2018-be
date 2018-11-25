@@ -1,21 +1,48 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using WikiQuiz.Models;
+using WikiQuiz.Services.Fetching;
 
 namespace WikiQuiz.Services
 {
     public class TriviaCreationService
     {
-        public Trivia Create(int count = 1)
-        {
-            Trivia trivia = new Trivia();
+        public Source _source { get; private set; }
 
-            for (int i = 0; i < count; i++)
+        public enum Source
+        {
+            Wiki,
+            Memepedia
+        }
+
+        public TriviaCreationService(Source source)
+        {
+            _source = source;
+        }
+
+        public async Task<Trivia> Create(int count = 1)
+        {
+            if (_source == Source.Wiki)
             {
-                var q1 = new TriviaQuestion { Question = $"This is q-{i}", Answer = $"Answer for {i}", WrongAnswers = new List<string> { "Wrong1", "Wrong2", "Wrong3", "Wrong4" } };
-                trivia.Add(q1);
+                var fetcher = new WikiFetchingService();
+
+                Trivia trivia = new Trivia();
+
+                for (int i = 0; i < count; i++)
+                {
+                    var question = await fetcher.GetRandomQuestion();
+                    trivia.Add(question);
+                }
+
+                return trivia;
+            }
+            else if (_source == Source.Memepedia)
+            {
+                var fetcher = new MemepediaFetchingService();
             }
 
-            return trivia;
+            throw new NotSupportedException($"Source {_source} is not supported.");
         }
     }
 }

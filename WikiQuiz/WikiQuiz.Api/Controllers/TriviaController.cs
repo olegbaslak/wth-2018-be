@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WikiQuiz.Services;
+using static WikiQuiz.Services.TriviaCreationService;
 
 namespace WikiQuiz.Api.Controllers
 {
@@ -13,12 +14,25 @@ namespace WikiQuiz.Api.Controllers
     {
         // GET api/trivia
         [HttpGet]
-        public JsonResult Get()
+        public async Task<JsonResult> Get()
         {
             Console.WriteLine("Queried");
-            var service = new TriviaCreationService();
-            
-            return new JsonResult(service.Create(4));
+            var service = new TriviaCreationService(Source.Wiki);
+            var trivia = await service.Create(3);
+
+            return new JsonResult(trivia);
+        }
+
+        // GET api/trivia/{count}?source=wiki
+        [HttpGet("{count}")]
+        public async Task<JsonResult> Get(int count, string source)
+        {
+            var isParsed = Enum.TryParse(source, out Source quizSource);
+
+            var service = new TriviaCreationService(quizSource);
+            var trivia = await service.Create(count);
+
+            return new JsonResult(trivia);
         }
     }
 }
