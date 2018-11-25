@@ -62,6 +62,7 @@ namespace WikiQuiz.Services
                 trivia.Add(question);
             }
 
+            GC.Collect();
             return trivia;
 
             /*

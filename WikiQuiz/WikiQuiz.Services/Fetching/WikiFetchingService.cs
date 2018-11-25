@@ -1,5 +1,4 @@
-﻿using Bogus;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -17,8 +16,6 @@ namespace WikiQuiz.Services.Fetching
         private const string ApiEndpoint = "https://ru.wikipedia.org/wiki/Special:Random";
 
         private const string SquareBracetsPattern = @"\[.*?\]";
-
-        private readonly Faker _faker = new Faker();
 
         private readonly IList<string> GarbishWords = new List<string> {
         "еще", "него", "сказать", "а", "ж", "нее", "со", "без", "же", "ней", "совсем", "более",
@@ -106,24 +103,24 @@ namespace WikiQuiz.Services.Fetching
 
             if (valueableWords.Count > 1)
             {
-                wrong1 = _faker.PickRandom(valueableWords);
+                wrong1 = valueableWords.RandomElement();
                 valueableWords.Remove(wrong1);
             }
-            else wrong1 = _faker.PickRandom(new Sentance(_faker.PickRandom(cleanSentances)).Words);
+            else wrong1 = new Sentance(cleanSentances.RandomElement()).Words.RandomElement();
 
             if (valueableWords.Count > 1)
             {
-                wrong2 = _faker.PickRandom(valueableWords);
+                wrong2 = valueableWords.RandomElement();
                 valueableWords.Remove(wrong2);
             }
-            else wrong2 = _faker.PickRandom(new Sentance(_faker.PickRandom(cleanSentances)).Words);
+            else wrong2 = new Sentance(cleanSentances.RandomElement()).Words.RandomElement();
 
             if (valueableWords.Count > 1)
             {
-                wrong3 = _faker.PickRandom(valueableWords);
+                wrong3 = valueableWords.RandomElement();
                 valueableWords.Remove(wrong3);
             }
-            else wrong3 = _faker.PickRandom(new Sentance(_faker.PickRandom(cleanSentances)).Words);
+            else wrong3 = new Sentance(cleanSentances.RandomElement()).Words.RandomElement();
 
             var shuffledAnswers = new List<string> { wrong1, "*", wrong2, wrong3 };
             shuffledAnswers.Shuffle();
@@ -142,18 +139,18 @@ namespace WikiQuiz.Services.Fetching
 
         private TriviaQuestion ParseRandomly(string htmlContent)
         {
-            var paragraphs = ExtractParagraps(htmlContent);
-            var randomParagraphText = _faker.PickRandom(paragraphs);
+            var paragraphs = ExtractParagraps(htmlContent).ToList();
+            var randomParagraphText = paragraphs.RandomElement();
 
             var cleanText = Regex.Replace(randomParagraphText, SquareBracetsPattern, string.Empty);
             var textEntity = new Text(cleanText);
             textEntity.RemoveOneWordSentances();
 
-            var sentanceEntity = _faker.PickRandom(textEntity.Sentances);
+            var sentanceEntity = textEntity.Sentances.RandomElement();
             var words = sentanceEntity.Words;
             var cleanWords = CleanFromGarbish(words);
 
-            var randomWord = _faker.PickRandom(cleanWords);
+            var randomWord = cleanWords.RandomElement();
             var boilerPlate = new string('_', randomWord.Length);
 
             var question = sentanceEntity.Text.Replace(randomWord, boilerPlate);

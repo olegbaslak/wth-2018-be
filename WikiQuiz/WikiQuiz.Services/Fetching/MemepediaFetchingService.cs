@@ -1,10 +1,9 @@
-﻿using Bogus;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.XPath;
 using WikiQuiz.Models;
@@ -24,8 +23,6 @@ namespace WikiQuiz.Services.Fetching
         private XPathExpression MemeCategoryXPath => XPathExpression.Compile("//*[@class='alpha-nav-ul']//a");
         private XPathExpression MemeByCategoryXPath(string category) => XPathExpression.Compile($"//*[@class='alpha-block' and h4[text()='{category}']]//a");
 
-        private readonly Faker _faker = new Faker();
-
         public async Task<string> FetchContent(string page)
         {
             var client = new RestClient(page);
@@ -40,10 +37,10 @@ namespace WikiQuiz.Services.Fetching
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(mainPageContent);
-            var categories = htmlDocument.DocumentNode.SelectNodes(MemeCategoryXPath).Select(c => c.InnerText);
-            var randomCategory = _faker.PickRandom(categories);
+            var categories = htmlDocument.DocumentNode.SelectNodes(MemeCategoryXPath).Select(c => c.InnerText).ToList();
+            var randomCategory = categories.RandomElement();
             var memesInCategory = htmlDocument.DocumentNode.SelectNodes(MemeByCategoryXPath(randomCategory)).ToList();
-            var randomMemeNode = _faker.PickRandom(memesInCategory);
+            var randomMemeNode = memesInCategory.RandomElement();
             var memeTitle = randomMemeNode.InnerText;
             var memeUrl = randomMemeNode.GetAttributeValue("href", "");
 
@@ -53,18 +50,27 @@ namespace WikiQuiz.Services.Fetching
             htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(memePageContent);
 
-            var imagesHtlm = htmlDocument.DocumentNode.SelectNodes(ImageInPostXPath)?.Select(n => n.OuterHtml) ?? new List<string>();
-            var videosHtlm = htmlDocument.DocumentNode.SelectNodes(VideoInPostXPath)?.Select(n => n.OuterHtml) ?? new List<string>();
+            var imagesHtlm = htmlDocument.DocumentNode.SelectNodes(ImageInPostXPath)?.Select(n => n.OuterHtml).ToList() ?? new List<string>();
+            var videosHtlm = htmlDocument.DocumentNode.SelectNodes(VideoInPostXPath)?.Select(n => n.OuterHtml).ToList() ?? new List<string>();
             //var twitter = htmlDocument.DocumentNode.SelectNodes(TwitterEmbdedXPath).Select(n => n.OuterHtml);
 
-            var allMemeImagesHtml = imagesHtlm.Concat(videosHtlm).ToList();
-            var randomMemeImageHtml = _faker.PickRandom(allMemeImagesHtml);
+            string randomMemeImageHtml = string.Empty;
+            if (videosHtlm.Count > 0)
+            {
+                randomMemeImageHtml = videosHtlm.RandomElement();
+            }
+            else
+            {
+                randomMemeImageHtml = imagesHtlm.RandomElement();
+            }
+            CleanupImageHtml(randomMemeImageHtml);
 
-            var wrong1 = _faker.PickRandom(allMemeA);
+            var allMemeImagesHtml = imagesHtlm.Concat(videosHtlm).ToList();
+            var wrong1 = allMemeA.RandomElement();
             allMemeA.Remove(wrong1);
-            var wrong2 = _faker.PickRandom(allMemeA);
+            var wrong2 = allMemeA.RandomElement();
             allMemeA.Remove(wrong2);
-            var wrong3 = _faker.PickRandom(allMemeA);
+            var wrong3 = allMemeA.RandomElement();
 
             var shuffledAnswers = new List<string> { wrong1.InnerText, wrong2.InnerText, "*", wrong3.InnerText };
             shuffledAnswers.Shuffle();
@@ -77,6 +83,7 @@ namespace WikiQuiz.Services.Fetching
                 Correct = correctIndex + 1,
                 Answers = shuffledAnswers
             };
+
 
             return triviaQuestion;
         }
@@ -105,9 +112,10 @@ namespace WikiQuiz.Services.Fetching
             throw new Exception("Something went wrong during fetching question");
         }
 
-        public TriviaQuestion Parse(string htmlContent)
+        private void CleanupImageHtml(string imageHtml)
         {
-            throw new NotImplementedException();
+            imageHtml = Regex.Replace(imageHtml, "(width=\".*? \")", string.Empty);
+            imageHtml = Regex.Replace(imageHtml, "(height=\".*? \")", string.Empty);
         }
     }
 }
